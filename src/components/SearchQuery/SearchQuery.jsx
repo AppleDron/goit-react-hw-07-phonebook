@@ -6,10 +6,11 @@ import {
   SearchQueryContainer,
   SearchQueryP,
 } from './SearchQuery.styled';
+import { selectFilter } from 'redux/selectors';
 
 const SearchQuery = () => {
   const dispatch = useDispatch();
-  const filter = useSelector(state => state.filter);
+  const filter = useSelector(selectFilter);
 
   const filterContacts = e => {
     dispatch(setFilter(e.target.value));

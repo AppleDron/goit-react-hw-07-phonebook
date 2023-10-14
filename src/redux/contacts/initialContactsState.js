@@ -1,1 +1,5 @@
-export const initialContactsState = [];
+export const initialContactsState = {
+  items: [],
+  isLoading: false,
+  error: '',
+};

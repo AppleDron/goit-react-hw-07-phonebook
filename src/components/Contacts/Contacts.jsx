@@ -1,37 +1,35 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { AiFillDelete } from 'react-icons/ai';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   ContactList,
   Contactitem,
   DeleteButton,
   TitleContacts,
 } from './Contacts.styled';
-import { AiFillDelete } from 'react-icons/ai';
-import { useDispatch, useSelector } from 'react-redux';
-import { deleteUser } from 'redux/contacts/contactsSlice';
+import { deleteContact, getContactsThunk } from 'redux/contacts/operations';
+import {
+  selectError,
+  selectFilteredContacts,
+  selectIsLoading,
+} from 'redux/selectors';
 
 const Contacts = ({ children }) => {
   const dispatch = useDispatch();
-  const contacts = useSelector(state => state.contacts);
-  const filter = useSelector(state => state.filter);
+  const isLoading = useSelector(selectIsLoading);
+  const error = useSelector(selectError);
+  const filteredContacts = useSelector(selectFilteredContacts);
 
-  const deleteContact = id => {
-    dispatch(deleteUser(id));
-  };
-
-  const getVisibleContacts = () => {
-    const normalizedFilter = filter.toLowerCase();
-
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normalizedFilter)
-    );
-  };
-
-  const filteredContacts = getVisibleContacts();
+  useEffect(() => {
+    dispatch(getContactsThunk());
+  }, [dispatch]);
 
   return (
     <div>
       <TitleContacts>Contacts</TitleContacts>
       {children}
+      {isLoading && !error && <b>In progress...</b>}
+      {error && <b>Error!</b>}
       <ContactList>
         {filteredContacts.map(contact => (
           <Contactitem key={contact.id}>
@@ -40,7 +38,7 @@ const Contacts = ({ children }) => {
             </p>
             <DeleteButton
               type="button"
-              onClick={() => deleteContact(contact.id)}
+              onClick={() => dispatch(deleteContact(contact.id))}
             >
               <AiFillDelete />
             </DeleteButton>

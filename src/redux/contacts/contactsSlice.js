@@ -1,18 +1,30 @@
-const { createSlice } = require('@reduxjs/toolkit');
+import { createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { createContact, deleteContact, getContactsThunk } from './operations';
+import {
+  BASE_STATUS,
+  createContactFulfilled,
+  deleteContactFulfilled,
+  getContactsFulfilled,
+  getFunctionStatus,
+  handleError,
+  handleLoading,
+} from './services';
+
 const { initialContactsState } = require('./initialContactsState');
 
 const contactsSlice = createSlice({
   name: 'contacts',
   initialState: initialContactsState,
-  reducers: {
-    setNewUser(state, action) {
-      return [...state, action.payload];
-    },
-    deleteUser(state, action) {
-      return state.filter(user => user.id !== action.payload);
-    },
+
+  extraReducers: builder => {
+    const { PENDING, FULFILLED, REJECTED } = BASE_STATUS;
+    builder
+      .addCase(getContactsThunk[FULFILLED], getContactsFulfilled)
+      .addCase(createContact[FULFILLED], createContactFulfilled)
+      .addCase(deleteContact[FULFILLED], deleteContactFulfilled)
+      .addMatcher(isAnyOf(...getFunctionStatus(PENDING)), handleLoading)
+      .addMatcher(isAnyOf(...getFunctionStatus(REJECTED)), handleError);
   },
 });
 
 export const contactsReducer = contactsSlice.reducer;
-export const { setNewUser, deleteUser } = contactsSlice.actions;

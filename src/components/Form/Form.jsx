@@ -1,11 +1,11 @@
 import React from 'react';
 import { nanoid } from 'nanoid';
 import { Forma, Label } from './Form.styled';
-import { setNewUser } from 'redux/contacts/contactsSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { createContact } from 'redux/contacts/operations';
 
 const Form = () => {
-  const contacts = useSelector(state => state.contacts);
+  const contacts = useSelector(state => state.contacts.items);
   const dispatch = useDispatch();
   const nameId = nanoid();
   const numberId = nanoid();
@@ -19,14 +19,13 @@ const Form = () => {
       return alert(`${data.name} in already in contacts`);
     }
 
-    dispatch(setNewUser(data));
+    dispatch(createContact(data));
   };
 
   const handleSubmit = e => {
     e.preventDefault();
 
     addNewContact({
-      id: nanoid(),
       name: e.target.name.value,
       number: e.target.number.value,
     });
